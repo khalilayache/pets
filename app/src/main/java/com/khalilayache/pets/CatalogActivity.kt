@@ -12,6 +12,7 @@ import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_ID
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_NAME
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_WEIGHT
 import com.khalilayache.pets.data.PetContract.PetEntry.PET_CONTENT_URI
+import kotlinx.android.synthetic.main.activity_catalog.empty_view
 import kotlinx.android.synthetic.main.activity_catalog.fab
 import kotlinx.android.synthetic.main.activity_catalog.pets_list
 
@@ -83,6 +84,7 @@ class CatalogActivity : AppCompatActivity() {
     val petCursorAdapter = PetCursorAdapter(this@CatalogActivity, cursor)
 
     pets_list.adapter = petCursorAdapter
+    pets_list.emptyView = empty_view
 
   }
 
