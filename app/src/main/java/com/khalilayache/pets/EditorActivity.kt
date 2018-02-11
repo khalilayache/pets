@@ -22,6 +22,12 @@ class EditorActivity : AppCompatActivity() {
 
   companion object {
     fun createIntent(context: Context) = Intent(context, EditorActivity::class.java)
+
+    fun createIntentWithUri(context: Context, uri: Uri): Intent {
+      val intent = Intent(context, EditorActivity::class.java)
+      intent.data = uri
+      return intent
+    }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +35,9 @@ class EditorActivity : AppCompatActivity() {
     setContentView(R.layout.activity_editor)
 
     initSpinner()
+    initToolbar()
   }
+
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.menu_editor, menu)
@@ -93,22 +101,15 @@ class EditorActivity : AppCompatActivity() {
     genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line)
 
     spinnerGender!!.adapter = genderSpinnerAdapter
+  }
 
-    /*spinnerGender!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-      override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-        val selection = parent.getItemAtPosition(position) as String
-        if (!selection.isEmpty()) {
-          when (selection) {
-            "Male" -> PetContract.GENDER_MALE // Male
-            "Female" -> PetContract.GENDER_FEMALE // Female
-            else -> PetContract.GENDER_UNKNOWN // Unknown
-          }
-        }
-      }
+  private fun initToolbar() {
+    if (intent.data != null) {
+      setTitle(R.string.edit_pet)
+    } else {
+      setTitle(R.string.add_pet)
+    }
 
-      override fun onNothingSelected(parent: AdapterView<*>) {
-      }
-    }*/
   }
 
 }

@@ -1,6 +1,7 @@
 package com.khalilayache.pets
 
 import android.app.LoaderManager
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.CursorLoader
 import android.content.Loader
@@ -51,7 +52,6 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
   }
 
   private fun insertDummyPet() {
-
     val values = ContentValues()
 
     values.put(PetContract.PetEntry.COLUMN_NAME, "Toto")
@@ -60,7 +60,6 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
     values.put(PetContract.PetEntry.COLUMN_WEIGHT, 7)
 
     contentResolver.insert(PET_CONTENT_URI, values)
-
   }
 
   private fun initListeners() {
@@ -71,7 +70,6 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
 
   private fun initLoader() {
     loaderManager.initLoader<Cursor>(PET_LOADER, null, this)
-
   }
 
   private fun initListView() {
@@ -81,8 +79,16 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
 
     pets_list.emptyView = empty_view
 
-  }
+    pets_list.setOnItemClickListener { parent, view, position, id ->
 
+      startActivity( EditorActivity.createIntentWithUri(
+          this@CatalogActivity,
+          ContentUris.withAppendedId(
+              PET_CONTENT_URI,
+              id
+          )))
+    }
+  }
 
   override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
     val projection = arrayOf(COLUMN_ID,
