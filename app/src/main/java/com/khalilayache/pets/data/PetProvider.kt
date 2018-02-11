@@ -40,7 +40,6 @@ class PetProvider : ContentProvider() {
     val match = uriMatcher.match(uri)
 
     when (match) {
-
       PETS -> {
         db?.let {
           cursor = it.query(TABLE_NAME,
@@ -51,7 +50,6 @@ class PetProvider : ContentProvider() {
               null,
               sortOrder)
         }
-
       }
       PET_ID -> {
         val select = COLUMN_ID + "=?"
@@ -66,13 +64,9 @@ class PetProvider : ContentProvider() {
               null,
               sortOrder)
         }
-
       }
       else -> {
-
       }
-
-
     }
 
     cursor.setNotificationUri(context.contentResolver, uri)
@@ -92,7 +86,6 @@ class PetProvider : ContentProvider() {
       }
       else -> -1
     }
-
   }
 
   override fun delete(uri: Uri?, selection: String?, selectionArgs: Array<out String>?): Int {
@@ -114,7 +107,8 @@ class PetProvider : ContentProvider() {
       }
     }
 
-    context.contentResolver.notifyChange(uri,null)
+    if (result > 0)
+      context.contentResolver.notifyChange(uri, null)
 
     return result
   }
@@ -147,21 +141,23 @@ class PetProvider : ContentProvider() {
 
     if (weight < 0) throw IllegalArgumentException("Pet requires valid weight")
 
-
     if (values?.size() == 0) {
       return 0
     }
 
     val db = petDbHelper?.writableDatabase
 
+    var result: Int = -1
+
     db?.let {
 
-      return db.update(TABLE_NAME, values, selection, selectionArgs)
+      result = db.update(TABLE_NAME, values, selection, selectionArgs)
     }
 
-    context.contentResolver.notifyChange(uri, null)
+    if (result > 0)
+      context.contentResolver.notifyChange(uri, null)
 
-    return -1
+    return result
   }
 
   private fun insertPet(uri: Uri?, values: ContentValues?): Uri {
@@ -179,7 +175,6 @@ class PetProvider : ContentProvider() {
     if (name.isEmpty()) throw IllegalArgumentException("Pet requires valid name")
 
     if (weight < 0) throw IllegalArgumentException("Pet requires valid weight")
-
 
     var id: Long = -1L
     db?.let {
