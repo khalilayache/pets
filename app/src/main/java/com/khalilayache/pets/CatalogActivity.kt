@@ -13,7 +13,7 @@ import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_NAME
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_WEIGHT
 import com.khalilayache.pets.data.PetContract.PetEntry.PET_CONTENT_URI
 import kotlinx.android.synthetic.main.activity_catalog.fab
-import kotlinx.android.synthetic.main.activity_catalog.textPetInfo
+import kotlinx.android.synthetic.main.activity_catalog.pets_list
 
 class CatalogActivity : AppCompatActivity() {
 
@@ -80,21 +80,10 @@ class CatalogActivity : AppCompatActivity() {
         null,
         null)
 
-    val petList: ArrayList<Pet> = ArrayList()
+    val petCursorAdapter = PetCursorAdapter(this@CatalogActivity, cursor)
 
-    while (cursor.moveToNext()) {
-      val name = cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_NAME))
-      val breed = cursor.getString(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_BREED))
-      val genderId = cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_GENDER))
-      val weight = cursor.getInt(cursor.getColumnIndex(PetContract.PetEntry.COLUMN_WEIGHT))
+    pets_list.adapter = petCursorAdapter
 
-      val gender = getGender(genderId)
-
-      petList.add(Pet(name, breed, gender, weight))
-    }
-
-    cursor.close()
-    displayDatabaseInfos(petList)
   }
 
   private fun getGender(genderId: Int): String {
@@ -105,16 +94,4 @@ class CatalogActivity : AppCompatActivity() {
     }
   }
 
-  private fun displayDatabaseInfos(pets: ArrayList<Pet>) {
-
-    textPetInfo.text = "The pets table contains ${pets.size} pets.\n\n"
-
-    for (pet: Pet in pets) {
-      textPetInfo.append(PetContract.PetEntry.COLUMN_NAME.toUpperCase() + "\t-\t" + pet.name + "\n" +
-          PetContract.PetEntry.COLUMN_BREED.toUpperCase() + "\t-\t" + pet.breed + "\n" +
-          PetContract.PetEntry.COLUMN_GENDER.toUpperCase() + "\t-\t" + pet.gender + "\n" +
-          PetContract.PetEntry.COLUMN_WEIGHT.toUpperCase() + "\t-\t" + pet.weight + "\n\n")
-    }
-
-  }
 }

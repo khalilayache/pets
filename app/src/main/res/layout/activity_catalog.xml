@@ -6,18 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".CatalogActivity">
 
-    <TextView
-        android:id="@+id/textPetInfo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/activity_margin"/>
+  <ListView
+      android:id="@+id/pets_list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      tools:listitem="@layout/list_item"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_pet"/>
+  <android.support.design.widget.FloatingActionButton
+      android:id="@+id/fab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentEnd="true"
+      android:layout_margin="@dimen/fab_margin"
+      android:src="@drawable/ic_add_pet"/>
 </RelativeLayout>
