@@ -75,6 +75,8 @@ class PetProvider : ContentProvider() {
 
     }
 
+    cursor.setNotificationUri(context.contentResolver, uri)
+
     return cursor
   }
 
@@ -96,20 +98,25 @@ class PetProvider : ContentProvider() {
   override fun delete(uri: Uri?, selection: String?, selectionArgs: Array<out String>?): Int {
     val db = petDbHelper?.writableDatabase
 
+    var result: Int = -1
+
     db?.let {
       val match = uriMatcher.match(uri)
-      when (match) {
+      result = when (match) {
         PETS ->
-          return db.delete(TABLE_NAME, selection, selectionArgs)
+          db.delete(TABLE_NAME, selection, selectionArgs)
         PET_ID -> {
           val select = "$COLUMN_ID=?"
           val selectArgs = arrayOf(ContentUris.parseId(uri).toString())
-          return db.delete(TABLE_NAME, select, selectArgs)
+          db.delete(TABLE_NAME, select, selectArgs)
         }
         else -> throw IllegalArgumentException("Deletion is not supported for " + uri)
       }
     }
-    return -1
+
+    context.contentResolver.notifyChange(uri,null)
+
+    return result
   }
 
   override fun getType(uri: Uri?): String {
@@ -152,6 +159,8 @@ class PetProvider : ContentProvider() {
       return db.update(TABLE_NAME, values, selection, selectionArgs)
     }
 
+    context.contentResolver.notifyChange(uri, null)
+
     return -1
   }
 
@@ -178,6 +187,8 @@ class PetProvider : ContentProvider() {
     }
 
     if (id == -1L) return Uri.EMPTY
+
+    context.contentResolver.notifyChange(uri, null)
 
     return ContentUris.withAppendedId(uri, id)
   }
