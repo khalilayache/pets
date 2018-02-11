@@ -1,7 +1,9 @@
 package com.khalilayache.pets
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
@@ -9,7 +11,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.khalilayache.pets.data.PetDbManager
+import com.khalilayache.pets.data.PetContract
+import com.khalilayache.pets.data.PetContract.PetEntry.PET_CONTENT_URI
 import kotlinx.android.synthetic.main.activity_editor.editBreed
 import kotlinx.android.synthetic.main.activity_editor.editName
 import kotlinx.android.synthetic.main.activity_editor.editWeight
@@ -20,8 +23,6 @@ class EditorActivity : AppCompatActivity() {
   companion object {
     fun createIntent(context: Context) = Intent(context, EditorActivity::class.java)
   }
-
-  private val petDbManager by lazy { PetDbManager(this@EditorActivity) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -58,11 +59,30 @@ class EditorActivity : AppCompatActivity() {
     val weight = editWeight.text.toString().trim().toInt()
     val gender = spinnerGender.selectedItem.toString()
 
-    val savedId = petDbManager.insertPet(Pet(name, breed, gender, weight))
-    if (savedId != -1L) {
+    val savedId = contentResolver.insert(PET_CONTENT_URI, getContentValues(Pet(name, breed, gender, weight)))
+    if (savedId != Uri.EMPTY) {
       Toast.makeText(this@EditorActivity, "Pet saved with id: $savedId", Toast.LENGTH_SHORT).show()
     } else {
       Toast.makeText(this@EditorActivity, "Error with saving pet", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun getContentValues(pet: Pet): ContentValues {
+    val values = ContentValues()
+
+    values.put(PetContract.PetEntry.COLUMN_NAME, pet.name)
+    values.put(PetContract.PetEntry.COLUMN_BREED, pet.breed)
+    values.put(PetContract.PetEntry.COLUMN_GENDER, getGenderId(pet.gender))
+    values.put(PetContract.PetEntry.COLUMN_WEIGHT, pet.weight)
+
+    return values
+  }
+
+  private fun getGenderId(gender: String): Int {
+    return when (gender) {
+      "Male" -> PetContract.PetEntry.GENDER_MALE
+      "Female" -> PetContract.PetEntry.GENDER_FEMALE
+      else -> PetContract.PetEntry.GENDER_UNKNOWN
     }
   }
 

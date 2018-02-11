@@ -17,5 +17,9 @@
       </intent-filter>
     </activity>
     <activity android:name=".EditorActivity"/>
+    <provider
+        android:authorities="com.khalilayache.pets"
+        android:name=".data.PetProvider"
+        android:exported="false"/>
   </application>
 </manifest>
