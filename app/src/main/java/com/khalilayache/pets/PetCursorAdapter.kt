@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_BREED
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_NAME
 
-class PetCursorAdapter(context: Context, cursor: Cursor) : CursorAdapter(context, cursor, 0) {
+class PetCursorAdapter(context: Context, cursor: Cursor?) : CursorAdapter(context, cursor, 0) {
 
 
   override fun newView(context: Context?, cursor: Cursor?, parent: ViewGroup?): View {
