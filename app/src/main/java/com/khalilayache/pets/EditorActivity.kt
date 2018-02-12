@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import com.khalilayache.pets.data.PetContract
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_BREED
 import com.khalilayache.pets.data.PetContract.PetEntry.COLUMN_GENDER
@@ -62,7 +63,6 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
     when (item.itemId) {
       R.id.action_save -> {
         saveNewPet()
-        finish()
         return true
       }
       R.id.action_delete ->
@@ -111,10 +111,20 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
   }
 
   private fun saveNewPet() {
+    if (editBreed.text.toString().isEmpty() or
+        editName.text.toString().isEmpty()) {
+      Toast.makeText(this@EditorActivity, "Invalid data! There are blank/empty fields", Toast.LENGTH_SHORT).show()
+      return
+    }
+
     val name = editName.text.toString().trim()
     val breed = editBreed.text.toString().trim()
-    val weight = editWeight.text.toString().trim().toInt()
     val gender = spinnerGender.selectedItem.toString()
+    var weight = 0
+
+    if (!editWeight.text.toString().isEmpty()){
+      weight = editBreed.text.toString().trim().toInt()
+    }
 
     if (CURRENT_URI == null) {
       contentResolver.insert(PET_CONTENT_URI, getContentValues(Pet(name, breed, gender, weight)))
@@ -122,6 +132,7 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
       contentResolver.update(CURRENT_URI, getContentValues(Pet(name, breed, gender, weight)), null, null)
     }
 
+    finish()
   }
 
   private fun getContentValues(pet: Pet): ContentValues {
