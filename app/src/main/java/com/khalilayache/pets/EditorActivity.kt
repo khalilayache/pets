@@ -123,6 +123,28 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
     spinnerGender.setSelection(0)
   }
 
+  override fun onBackPressed() {
+    if (!mPetHasChanged) {
+      super.onBackPressed()
+      return
+    }
+
+    val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+      finish()
+    }
+
+    showUnsavedChangesDialog(discardButtonClickListener)
+  }
+
+  override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+    super.onPrepareOptionsMenu(menu)
+    if (CURRENT_URI == null) {
+      val menuItem = menu?.findItem(R.id.action_delete)
+      menuItem?.isVisible = false
+    }
+    return true
+  }
+
   private fun initLoader() {
     loaderManager.initLoader<Cursor>(EDITOR_LOADER, null, this)
   }
@@ -187,8 +209,8 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
       initLoader()
     } else {
       setTitle(R.string.add_pet)
+      invalidateOptionsMenu()
     }
-
   }
 
   private fun initActivity() {
@@ -198,20 +220,6 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
     editBreed.setOnTouchListener(mTouchListener)
     spinnerGender.setOnTouchListener(mTouchListener)
   }
-
-  override fun onBackPressed() {
-    if (!mPetHasChanged) {
-      super.onBackPressed()
-      return
-    }
-
-    val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
-      finish()
-    }
-
-    showUnsavedChangesDialog(discardButtonClickListener)
-  }
-
 
   private fun showUnsavedChangesDialog(
       discardButtonClickListener: DialogInterface.OnClickListener) {
