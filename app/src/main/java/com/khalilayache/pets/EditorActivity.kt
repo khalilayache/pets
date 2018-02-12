@@ -70,11 +70,13 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_save -> {
-        saveNewPet()
+        savePet()
         return true
       }
-      R.id.action_delete ->
+      R.id.action_delete -> {
+        deletePet()
         return true
+      }
       android.R.id.home -> {
         if (!mPetHasChanged) {
           NavUtils.navigateUpFromSameTask(this@EditorActivity)
@@ -149,7 +151,7 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
     loaderManager.initLoader<Cursor>(EDITOR_LOADER, null, this)
   }
 
-  private fun saveNewPet() {
+  private fun savePet() {
     if (editBreed.text.toString().isEmpty() or
         editName.text.toString().isEmpty()) {
       Toast.makeText(this@EditorActivity, "Invalid data! There are blank/empty fields", Toast.LENGTH_SHORT).show()
@@ -161,7 +163,7 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
     val gender = spinnerGender.selectedItem.toString()
     var weight = 0
 
-    if (!editWeight.text.toString().isEmpty()){
+    if (!editWeight.text.toString().isEmpty()) {
       weight = editBreed.text.toString().trim().toInt()
     }
 
@@ -171,6 +173,25 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
       contentResolver.update(CURRENT_URI, getContentValues(Pet(name, breed, gender, weight)), null, null)
     }
 
+    finish()
+  }
+
+  private fun showDeleteConfirmationDialog() {
+    val builder = AlertDialog.Builder(this)
+    builder.setMessage(R.string.delete_dialog_msg)
+    builder.setPositiveButton(R.string.delete, { dialog, id ->
+      deletePet()
+    })
+    builder.setNegativeButton(R.string.cancel, { dialog, id ->
+      dialog?.dismiss()
+    })
+
+    val alertDialog = builder.create()
+    alertDialog.show()
+  }
+
+  private fun deletePet() {
+   contentResolver.delete(CURRENT_URI, null, null)
     finish()
   }
 
