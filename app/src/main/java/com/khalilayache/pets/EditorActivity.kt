@@ -1,9 +1,11 @@
 package com.khalilayache.pets
 
+import android.app.AlertDialog
 import android.app.LoaderManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.Loader
 import android.database.Cursor
@@ -13,6 +15,7 @@ import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.khalilayache.pets.data.PetContract
@@ -42,7 +45,12 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
 
   private var CURRENT_URI: Uri? = null
 
-  private val petCursorAdapter by lazy { PetCursorAdapter(this@EditorActivity, null) }
+  private var mPetHasChanged = false
+
+  private val mTouchListener = View.OnTouchListener { view, motionEvent ->
+    mPetHasChanged = true
+    false
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -68,7 +76,16 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
       R.id.action_delete ->
         return true
       android.R.id.home -> {
-        NavUtils.navigateUpFromSameTask(this)
+        if (!mPetHasChanged) {
+          NavUtils.navigateUpFromSameTask(this@EditorActivity)
+          return true
+        }
+
+        val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+          NavUtils.navigateUpFromSameTask(this@EditorActivity)
+        }
+
+        showUnsavedChangesDialog(discardButtonClickListener)
         return true
       }
     }
@@ -176,6 +193,36 @@ class EditorActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor
 
   private fun initActivity() {
     CURRENT_URI = intent.data
+    editWeight.setOnTouchListener(mTouchListener)
+    editName.setOnTouchListener(mTouchListener)
+    editBreed.setOnTouchListener(mTouchListener)
+    spinnerGender.setOnTouchListener(mTouchListener)
   }
 
+  override fun onBackPressed() {
+    if (!mPetHasChanged) {
+      super.onBackPressed()
+      return
+    }
+
+    val discardButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+      finish()
+    }
+
+    showUnsavedChangesDialog(discardButtonClickListener)
+  }
+
+
+  private fun showUnsavedChangesDialog(
+      discardButtonClickListener: DialogInterface.OnClickListener) {
+    val builder = AlertDialog.Builder(this)
+    builder.setMessage(R.string.unsaved_changes_dialog_msg)
+    builder.setPositiveButton(R.string.discard, discardButtonClickListener)
+    builder.setNegativeButton(R.string.keep_editing, { dialog, id ->
+      dialog?.dismiss()
+    })
+
+    val alertDialog = builder.create()
+    alertDialog.show()
+  }
 }
