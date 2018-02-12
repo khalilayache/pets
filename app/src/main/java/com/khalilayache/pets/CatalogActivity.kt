@@ -1,5 +1,6 @@
 package com.khalilayache.pets
 
+import android.app.AlertDialog
 import android.app.LoaderManager
 import android.content.ContentUris
 import android.content.ContentValues
@@ -45,10 +46,32 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
         insertDummyPet()
         return true
       }
-      R.id.action_delete_all_entries ->
-        return true
+      R.id.action_delete_all_entries ->{
+        showDeleteConfirmationDialog()
+        return true}
     }
     return super.onOptionsItemSelected(item)
+  }
+
+  override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+    val projection = arrayOf(COLUMN_ID,
+        COLUMN_NAME,
+        COLUMN_BREED)
+
+    return CursorLoader(this,
+        PET_CONTENT_URI,
+        projection,
+        null,
+        null,
+        null)
+  }
+
+  override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
+    petCursorAdapter.swapCursor(data)
+  }
+
+  override fun onLoaderReset(loader: Loader<Cursor>?) {
+    petCursorAdapter.swapCursor(null)
   }
 
   private fun insertDummyPet() {
@@ -90,25 +113,22 @@ class CatalogActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Curso
     }
   }
 
-  override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-    val projection = arrayOf(COLUMN_ID,
-        COLUMN_NAME,
-        COLUMN_BREED)
+  private fun showDeleteConfirmationDialog() {
+    val builder = AlertDialog.Builder(this)
+    builder.setMessage(R.string.delete_dialog_msg)
+    builder.setPositiveButton(R.string.delete, { dialog, id ->
+      deletePet()
+    })
+    builder.setNegativeButton(R.string.cancel, { dialog, id ->
+      dialog?.dismiss()
+    })
 
-    return CursorLoader(this,
-        PET_CONTENT_URI,
-        projection,
-        null,
-        null,
-        null)
+    val alertDialog = builder.create()
+    alertDialog.show()
   }
 
-  override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
-    petCursorAdapter.swapCursor(data)
-  }
-
-  override fun onLoaderReset(loader: Loader<Cursor>?) {
-    petCursorAdapter.swapCursor(null)
+  private fun deletePet() {
+    contentResolver.delete(PET_CONTENT_URI, null, null)
   }
 
 }
